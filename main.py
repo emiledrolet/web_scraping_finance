@@ -1,63 +1,14 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-import pandas as pd
 from tkinter import *
+from stock import Stock
+
 
 # import os
 # os.environ("NAME_OF_THE_VARIABLE")
 
-#TODO Transform the code in the OOP Form
-#class FinancialDataStock():
-
-#   getIncomeStatement()
-#   getBalanceSheet()
-#   getCashFlow()
-
-
 def traitement(stock):
-    # Keep Chrome browser open after program finishes
-    chrome_option = webdriver.ChromeOptions()
-    chrome_option.add_experimental_option("detach", True)
 
-    # Which browser to choose. This is a class.
-    driver = webdriver.Chrome(options=chrome_option)
-
-    driver.get(f"https://finance.yahoo.com/quote/{stock}/financials?p={stock}")
-
-    # Click on Expand all
-    expand = driver.find_element(By.XPATH, value='//*[@id="Col1-1-Financials-Proxy"]/section/div[2]/button')
-    expand.click()
-
-    # Recuperer les data
-    financial_data = driver.find_elements(By.CSS_SELECTOR, value='div[data-test="fin-row"] div[data-test="fin-col"] ')
-    names_column = driver.find_elements(By.CSS_SELECTOR, value='div[class="D(tbr) C($primaryColor)"] span')
-    names_row = driver.find_elements(By.CSS_SELECTOR, value='div[class="D(tbr) fi-row Bgc($hoverBgColor):h"] span[class="Va(m)"]')
-
-    #Mettre les data dans des listes
-    financial_data_list = [data.text for data in financial_data]
-    names_column_list = [data.text for data in names_column]
-    names_row_list = [data.text for data in names_row]
-
-
-    NUMBER_OF_COLUMNS = len(names_column_list)
-
-
-    #Initialisation du tableau
-    tableau = pd.DataFrame()
-
-    #Append the tableau
-    for i in range(0, NUMBER_OF_COLUMNS):
-        if i == 0:
-            #Premiere colonne
-            tableau[names_column_list[i]] = names_row_list
-        else:
-            #Autre colonne
-            tableau[names_column_list[i]] = financial_data_list[i-1::NUMBER_OF_COLUMNS - 1]
-
-    # TODO Put the ouput in your download folder
-    tableau.to_excel(f'output_{stock}.xlsx', index=False)
-
-    driver.quit()
+    test = Stock(stock, expand_all=True)
+    test.getIncomeStatemet()
 
     window_enter = Toplevel(window)
     center_window(window_enter)
@@ -101,5 +52,14 @@ button_enter.grid(column=0, row=3)
 #Entry
 stock_input = Entry(width=10)
 stock_input.grid(column=1, row=1)
+
+#TODO Add checkbox (something like that) for each parameter
+# The parameters are:
+# Income Statement
+# Balanche Sheet
+# CashFlow
+# Expand All
+
+
 
 window.mainloop()
