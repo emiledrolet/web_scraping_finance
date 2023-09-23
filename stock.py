@@ -11,11 +11,18 @@ class Stock:
 
     def __init__(self, ticker: str, income_statement:bool = True, balance_sheet:bool = True, cash_flow:bool = True,
                  expand_all: bool = False):
+        #Specifics
         self.ticker = ticker
+
+        #Pages
         self.isIncomeStatement = income_statement
         self.isBalanceSheet = balance_sheet
         self.isCashFlow = cash_flow
+
+        #Options
         self.isExpandAll = expand_all
+
+        #Others
         self.driver = None
 
     def web_scraping(self):
@@ -25,13 +32,13 @@ class Stock:
 
         #TODO Can do un for loop maybe. Need a list of each option or something like that
         if self.isIncomeStatement:
-            self.getIncomeStatemet()
+            self.getFinancialStatement("financials")
             self.openNewWindow()
         if self.isBalanceSheet:
-            self.getBalanceSheet()
+            self.getFinancialStatement("balance-sheet")
             self.openNewWindow()
         if self.isCashFlow:
-            self.getCashFlow()
+            self.getFinancialStatement("cash-flow")
             self.openNewWindow()
 
         self.driver.quit()
@@ -64,12 +71,9 @@ class Stock:
 
 
     #TODO Create .getFinancialStatement to avoid repetition for Income Statement, Balance Sheet, and Cash Flow
-    def getFinancialStatement(self):
-        pass
+    def getFinancialStatement(self,financial_statement):
 
-    def getIncomeStatemet(self):
-
-        self.driver.get(f"https://finance.yahoo.com/quote/{self.ticker}/financials?p={self.ticker}")
+        self.driver.get(f"https://finance.yahoo.com/quote/{self.ticker}/{financial_statement}?p={self.ticker}")
 
 
         # Click on Expand all
@@ -103,80 +107,8 @@ class Stock:
                 # Autre colonne
                 tableau[names_column_list[i]] = financial_data_list[i - 1::NUMBER_OF_COLUMNS - 1]
 
-        # TODO Put the output in your download folder
-        tableau.to_excel(f'output_{self.ticker}_IncomeStatement.xlsx', index=False)
 
-    def getBalanceSheet(self):
-        self.driver.get(f"https://finance.yahoo.com/quote/{self.ticker}/balance-sheet?p={self.ticker}")
+        tableau.to_excel(f'output_{self.ticker}_{financial_statement}.xlsx', index=False)
 
-        # Click on Expand all
-        if self.isExpandAll:
-            expand = self.driver.find_element(By.XPATH, value='//*[@id="Col1-1-Financials-Proxy"]/section/div[2]/button')
-            expand.click()
-
-        # Récuperer les data
-        financial_data = self.driver.find_elements(By.CSS_SELECTOR,
-                                                   value='div[data-test="fin-row"] div[data-test="fin-col"] ')
-        names_column = self.driver.find_elements(By.CSS_SELECTOR, value='div[class="D(tbr) C($primaryColor)"] span')
-        names_row = self.driver.find_elements(By.CSS_SELECTOR,
-                                         value='div[class="D(tbr) fi-row Bgc($hoverBgColor):h"] span[class="Va(m)"]')
-
-        # Mettre les data dans des listes
-        financial_data_list = [data.text for data in financial_data]
-        names_column_list = [data.text for data in names_column]
-        names_row_list = [data.text for data in names_row]
-
-        NUMBER_OF_COLUMNS = len(names_column_list)
-
-        # Initialisation du tableau
-        tableau = pd.DataFrame()
-
-        # Append the tableau
-        for i in range(0, NUMBER_OF_COLUMNS):
-            if i == 0:
-                # Premiere colonne
-                tableau[names_column_list[i]] = names_row_list
-            else:
-                # Autre colonne
-                tableau[names_column_list[i]] = financial_data_list[i - 1::NUMBER_OF_COLUMNS - 1]
-
-        tableau.to_excel(f'output_{self.ticker}_BalanceSheet.xlsx', index=False)
-
-    def getCashFlow(self):
-        self.driver.get(f"https://finance.yahoo.com/quote/{self.ticker}/cash-flow?p={self.ticker}")
-
-        # Click on Expand all
-        if self.isExpandAll:
-            expand = self.driver.find_element(By.XPATH,
-                                              value='//*[@id="Col1-1-Financials-Proxy"]/section/div[2]/button')
-            expand.click()
-
-        # Récuperer les data
-        financial_data = self.driver.find_elements(By.CSS_SELECTOR,
-                                                   value='div[data-test="fin-row"] div[data-test="fin-col"] ')
-        names_column = self.driver.find_elements(By.CSS_SELECTOR, value='div[class="D(tbr) C($primaryColor)"] span')
-        names_row = self.driver.find_elements(By.CSS_SELECTOR,
-                                              value='div[class="D(tbr) fi-row Bgc($hoverBgColor):h"] span[class="Va(m)"]')
-
-        # Mettre les data dans des listes
-        financial_data_list = [data.text for data in financial_data]
-        names_column_list = [data.text for data in names_column]
-        names_row_list = [data.text for data in names_row]
-
-        NUMBER_OF_COLUMNS = len(names_column_list)
-
-        # Initialisation du tableau
-        tableau = pd.DataFrame()
-
-        # Append the tableau
-        for i in range(0, NUMBER_OF_COLUMNS):
-            if i == 0:
-                # Premiere colonne
-                tableau[names_column_list[i]] = names_row_list
-            else:
-                # Autre colonne
-                tableau[names_column_list[i]] = financial_data_list[i - 1::NUMBER_OF_COLUMNS - 1]
-
-        tableau.to_excel(f'output_{self.ticker}_CashFlow.xlsx', index=False)
 
 
