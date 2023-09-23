@@ -5,10 +5,11 @@ from stock import Stock
 # import os
 # os.environ("NAME_OF_THE_VARIABLE")
 
-def traitement(stock):
+def process(stock):
 
-    test = Stock(stock, expand_all=True)
-    test.getIncomeStatemet()
+    ticker = Stock(stock, expand_all=True)
+    ticker.web_scraping()
+
 
     window_enter = Toplevel(window)
     center_window(window_enter)
@@ -29,7 +30,7 @@ def center_window(window):
 
 def button_clicked():
     stock = stock_input.get()
-    traitement(stock)
+    process(stock)
 
 window = Tk()
 window.title("Web Scraping Financial Data")
