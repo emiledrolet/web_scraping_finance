@@ -5,16 +5,17 @@ import pandas as pd
 #TODO Have one excel only, or can be an option
 
 #TODO Add the corresponding method for each parameter
-# Don't forget about we can choose several choices, so gonna have to decompose a little more
+
+#TODO Problem with consent(), put exception somehting like that. There is 2 cases.
 
 class Stock:
 
-    def __init__(self, ticker: str, income_statement:bool = True, balance_sheet:bool = True, cash_flow:bool = True,
-                 expand_all: bool = False):
-        #Specifics
+    def __init__(self, ticker: str, income_statement: bool, balance_sheet:bool, cash_flow:bool,
+                 expand_all: bool):
+        #Summary
         self.ticker = ticker
 
-        #Pages
+        #Pages chose
         self.isIncomeStatement = income_statement
         self.isBalanceSheet = balance_sheet
         self.isCashFlow = cash_flow
@@ -24,11 +25,12 @@ class Stock:
 
         #Others
         self.driver = None
+        self.oneTime = 0
 
     def web_scraping(self):
         self.getBrowser()
         self.openNewWindow()
-        self.consent()
+        # self.consent()
 
         #TODO Can do un for loop maybe. Need a list of each option or something like that
         if self.isIncomeStatement:
@@ -64,17 +66,20 @@ class Stock:
         self.driver.switch_to.window(window_handles[-1])
 
     def consent(self):
-        url_consent = 'https://consent.yahoo.com/v2/collectConsent?sessionId=1_cc-session_d6058863-b799-4e26-a4fd-7cc201d915d7'
-        self.driver.get(url_consent)
+        # url_consent = 'https://consent.yahoo.com/v2/collectConsent?sessionId=1_cc-session_d6058863-b799-4e26-a4fd-7cc201d915d7'
+        # self.driver.get(url_consent)
         consent = self.driver.find_element(By.XPATH, value='//*[@id="consent-page"]/div/div/div/form/div[2]/div[2]/button')
         consent.click()
 
 
-    #TODO Create .getFinancialStatement to avoid repetition for Income Statement, Balance Sheet, and Cash Flow
     def getFinancialStatement(self,financial_statement):
 
         self.driver.get(f"https://finance.yahoo.com/quote/{self.ticker}/{financial_statement}?p={self.ticker}")
 
+
+        if self.oneTime == 0:
+            self.consent()
+            self.oneTime += 1
 
         # Click on Expand all
         if self.isExpandAll:
