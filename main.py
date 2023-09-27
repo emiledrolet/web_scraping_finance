@@ -4,8 +4,8 @@ from stock import Stock
 # TODO Add widget for each option
 
 def process(stock):
-    ticker = Stock(stock, income_statement=income_clicked, balance_sheet=feature_balance, cash_flow=feature_cash,
-                   expand_all=feature_expand_all)
+    ticker = Stock(stock, income_statement=feature_income, balance_sheet=feature_balance, cash_flow=feature_cash,
+                   expand_all=feature_expand_all, summary=feature_summary)
     ticker.web_scraping()
 
     window_enter = Toplevel(window)
@@ -35,9 +35,14 @@ def balance_clicked():
     if isBalanceSheet.get() == 1:
         feature_balance = True
 def cash_clicked():
-    global  feature_cash
+    global feature_cash
     if isCashFlow.get() == 1:
         feature_cash = True
+
+def summary_clicked():
+    global feature_summary
+    if isSummary.get() == 1:
+        feature_summary = True
 
 
 
@@ -48,6 +53,7 @@ feature_income = False
 feature_balance = False
 feature_cash = False
 feature_expand_all = True
+feature_summary = False
 
 
 window = Tk()
@@ -98,6 +104,15 @@ checkCashFlow.grid(column=0, row=6)
 # Label Cash Flow
 my_label_cash= Label(text="cash flow")
 my_label_cash.grid(column=1, row=6)
+
+# Check Box - Summary
+isSummary = IntVar()
+checkSummary = Checkbutton(variable=isSummary, onvalue=1, offvalue=0, command=summary_clicked)
+checkSummary.grid(column=0, row=7)
+
+# Label Summary
+my_label_summary = Label(text="summary")
+my_label_summary.grid(column=1, row=7)
 
 
 
