@@ -100,7 +100,7 @@ class Stock:
 
     def getFinancialStatement(self, financial_statement):
 
-        self.driver.get(f"https://finance.yahoo.com/quote/{self.ticker}/{financial_statement}?p={self.ticker}")
+        self.driver.get(f"https://finance.yahoo.com/quote/{self.ticker}/{financial_statement}")
 
         if self.oneTime == 0:
             self.consent()
@@ -109,15 +109,17 @@ class Stock:
         # Click on Expand all
         if self.isExpandAll:
             expand = self.driver.find_element(By.XPATH,
-                                              value='//*[@id="Col1-1-Financials-Proxy"]/section/div[2]/button')
+                                              value='//*[@id="nimbus-app"]/section/section/section/article/article/div/div[2]/button')
             expand.click()
 
         # Récuperer les data
         financial_data = self.driver.find_elements(By.CSS_SELECTOR,
-                                                   value='div[data-test="fin-row"] div[data-test="fin-col"] ')
-        names_column = self.driver.find_elements(By.CSS_SELECTOR, value='div[class="D(tbr) C($primaryColor)"] span')
+                                                   value='div[class="column svelte-1xjz32c"], div[class="column svelte-1xjz32c alt"]')
+
+        names_column = self.driver.find_elements(By.CSS_SELECTOR, value='div[class="sticky column svelte-1ezv2n5"], div[class="column svelte-1ezv2n5"], div[class="column svelte-1ezv2n5 alt"]')
         names_row = self.driver.find_elements(By.CSS_SELECTOR,
-                                              value='div[class="D(tbr) fi-row Bgc($hoverBgColor):h"] span[class="Va(m)"]')
+                                              value='div[class="rowTitle svelte-1xjz32c"]')
+
 
         # Mettre les data dans des listes
         financial_data_list = [data.text for data in financial_data]
@@ -125,6 +127,17 @@ class Stock:
         names_row_list = [data.text for data in names_row]
 
         NUMBER_OF_COLUMNS = len(names_column_list)
+
+        print(financial_data_list)
+        print(names_column_list)
+        print(names_row_list)
+        print(NUMBER_OF_COLUMNS)
+
+        print(len(financial_data_list))
+        print(len(names_column_list))
+        print(len(names_row_list))
+
+
 
         # Initialisation du tableau
         tableau = pd.DataFrame()
@@ -136,6 +149,9 @@ class Stock:
                 tableau[names_column_list[i]] = names_row_list
             else:
                 # Autre colonne
-                tableau[names_column_list[i]] = financial_data_list[i - 1::NUMBER_OF_COLUMNS - 1]
+                tableau[names_column_list[i]] = financial_data_list[i - 1::NUMBER_OF_COLUMNS-1]
+
 
         tableau.to_excel(f'output_{self.ticker}_{financial_statement}.xlsx', index=False)
+
+        print(tableau)

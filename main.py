@@ -1,8 +1,8 @@
 from tkinter import *
 from stock import Stock
 
-# TODO Add widget for each option
 
+# TODO Add widget for each option
 def process(stock):
     ticker = Stock(stock, income_statement=feature_income, balance_sheet=feature_balance, cash_flow=feature_cash,
                    expand_all=feature_expand_all, summary=feature_summary)
